@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "gymnasiarbete-88157",
+  "private_key_id": "ddbeb855ae303e54a43ae9e9b55f8069b6a8746a",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEuwIBADANBgkqhkiG9w0BAQEFAASCBKUwggShAgEAAoIBAQCbIcZ451bnbMXg\n9wLebkpD24i0VTEHM+OLpStJCwcfM54sxAoDbGvfYHHt9f2Hph48YEu3v0Exr25s\nc+rgGcf5eVhiMs83JmGJqcwMrbPDLDqSjr4sBrcjFit+yH9nd63qi1Ptr+DlBHXm\n70drFXxFJ3pnbXolAf/6TQSGr2XzL4N1pQx//+0aRvvyl5WmpvJBJ1/Njrp5CuIW\nWGWSGoA6D8CaK29YVB+aKaQVvVOcxRJUUdXKO9sDENoFaW33pawVEmj4FZba0vdU\nH16jVZcJPzqIdDQ5NcLMAi3wTeEZPq2HdL/6W+WTOs0W9LlasxmRZjjS/Fhe7xzc\nleHvdkaRAgMBAAECgf99GI9jj6mUlTI8ZvP5Sha5AZ8LTGds13r2cQqmrC3iC03R\n64PnntaeGrfEnEkFyf830K8+TQvVdRImgpM0g5WupxuOlEpkvp6I1FOnJauAB3p0\nFIdmGUQ1FvucETIrzWaBbDkRwnIoO6CXyPxebcT4Pw2FudJ1ZVd2EAVGVspvfu6L\n0y4S/OwIjq2YyBFOrcVSQeAfWaYNwSky0p6/Lktpxb/JrrMwNjWWDe84fDA8JXaX\nC6Dkfju+giy3kheQ+DtQXtql9/0zN0GZFWx6x6c2lrbDKG+C2qsTvzi3Eq5rKyrC\n447qzqKKtR2+yvNfIvog+7pO5o9zuF+mzIajDiECgYEA2K53iRys1qiqZXC9rcvV\npf4dZmT9K9PowkAaaZC+G1ElZ3MRDy+X0zEuZ119iDAf3JcHtxYxXZI+GDf+EJ5u\n+5P2NrTRgN5nicMAInOpiQ1kfuZDZOIz5kaVduiRJROmIUnAAt/3e5XuIUNuPsnU\nB4LyOlwCR+gwFT+Y1fwbvCECgYEAt0gjY7xnAuLLhrzOJ0yFtfqdOQjNXXiIZc4L\n/GJVmZMIrxvfQRWzgyWcu5CWtpzTd6LFn/tFx8i5b5l/IfbwGaMpyK1bodQsPORU\nJO8DPQm85/8Lv9yTvITo5UU4o4pkvtyFwwBcwPuOqi4CZjXtSWBFNB/bTXz8eaCm\nVKcQvHECgYEA02bEcR1s87FzLa0lIh8wvtaCUJhO+Seye3KXUk9JatVsrNVy22IP\nupjNMUPhabGqJEml2VbpquU3d+GJGyW4GfNt0Enx7M0QLzP1OaemzHQojDaToiWf\nhRdwU6brlUTqXKfbkfJ5PjY1MnbbZJ79Iqb7NTz3bLh30QNPVda2KIECgYB5mjkw\nwR2vgn36xWYaGOFWHhMWdkqbS49jzFOTfkLBBBbs55c2fYl+6AOXRpVYT7DWXX61\naGeh6AFwk+0PweEHgYQFi0+SjU1UkUFqx9HkO4PEgSlwgI7cs2o6Q7USfI3fPDzb\nZnAj8kNzkdcxrXHkDyWbMc+1F8oDgJ0a6UVnYQKBgE1vWu59oq4AzKwnt1+ryJ4Q\n1fki3Ah7QQwJgLaIZnuwaxLQJFq2wop6BT4kvgdTvCEoZLOZDGgxJb15tR/aaIDr\n+PtVStBqNxyWNZHGtoyLqFzJteuQY64IDKcvH2oMnV3+4sdubwbuuv25CNhDzNKg\nTftE9hN2RdxyIcxhpajd\n-----END PRIVATE KEY-----\n",
+  "client_email": "firebase-adminsdk-tx7ub@gymnasiarbete-88157.iam.gserviceaccount.com",
+  "client_id": "115252272730207278003",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-tx7ub%40gymnasiarbete-88157.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}
