@@ -35,28 +35,27 @@ def exit_handler(): # Turn off the LEDs and clear the display when the program e
 # Register the exit handler
 atexit.register(exit_handler)
 
-def set_color(r, g, b):
-    for i in range(3):
+def set_color(r, g, b): # Function to set the color of the LEDs
+    for i in range(3): # Loop through all LEDs
         dots[i] = (g, b, r)  # Change the order to GBR, because it is the oder that the bonnet uses
     dots.show()
 set_color(255, 255, 0)  # Set all LEDs to yellow
 
-def speech_to_text(config: speech.RecognitionConfig, audio: speech.RecognitionAudio) -> speech.RecognizeResponse:
-    client = speech.SpeechClient()
+def speech_to_text(config: speech.RecognitionConfig, audio: speech.RecognitionAudio) -> speech.RecognizeResponse: # Convert speech to text
+    client = speech.SpeechClient() # Create client
     print("Speech to text started")
-    response = client.recognize(config=config, audio=audio)
+    response = client.recognize(config=config, audio=audio) # Send request to API
     return response
 
-def text_to_speech(text: str, output_filename: str):
-    synthesis_input = texttospeech.SynthesisInput(text=text)
-    voice = texttospeech.VoiceSelectionParams(language_code="sv-SE", ssml_gender=texttospeech.SsmlVoiceGender.NEUTRAL)
-    audio_config = texttospeech.AudioConfig(audio_encoding=texttospeech.AudioEncoding.MP3)
-    response = tts_client.synthesize_speech(input=synthesis_input, voice=voice, audio_config=audio_config)
-    with open(output_filename, "wb") as out:
-        out.write(response.audio_content)
+def text_to_speech(text: str, output_filename: str): # Convert text to speech
+    synthesis_input = texttospeech.SynthesisInput(text=text) # Create input object
+    voice = texttospeech.VoiceSelectionParams(language_code="sv-SE", ssml_gender=texttospeech.SsmlVoiceGender.NEUTRAL) # Create voice object
+    audio_config = texttospeech.AudioConfig(audio_encoding=texttospeech.AudioEncoding.MP3) # Create audio config object
+    response = tts_client.synthesize_speech(input=synthesis_input, voice=voice, audio_config=audio_config) # Send request to API
+    with open(output_filename, "wb") as out: # Write the response to a file
+        out.write(response.audio_content) 
 
-# Function to handle errors
-def handle_error(problem):
+def handle_error(he_problem): # Function to handle errors
     set_color(255, 0, 0)  # Set all LEDs to red
 
     # Clear the display
@@ -67,17 +66,17 @@ def handle_error(problem):
     draw = ImageDraw.Draw(image)
 
     # Draw the error message on the image
-    text = str(problem)
-    wrapped_text = textwrap.fill(text, width=max_chars, break_long_words=True)
+    text = str(he_problem)
+    wrapped_text = textwrap.fill(text, width=max_chars, break_long_words=True) # Wrap the text so that it fits on the display
     lines = wrapped_text.split('\n')
     y_text = 0  # Initialize y_text here
-    for line in lines:
-        bbox = draw.textbbox((0, y_text), line, font=font)
-        width, height = bbox[2] - bbox[0], bbox[3] - bbox[1]
-        if y_text + height > display.height:
+    for line in lines: # Draw each line
+        bbox = draw.textbbox((0, y_text), line, font=font) # Get the bounding box of the text
+        width, height = bbox[2] - bbox[0], bbox[3] - bbox[1] # Calculate the width and height of the text
+        if y_text + height > display.height: # If the text is too long to fit on the display
             break
-        draw.text((0, y_text), line, font=font, fill=0)
-        y_text += height
+        draw.text((0, y_text), line, font=font, fill=0) # Draw the text
+        y_text += height # Increment y_text by the height of the text
 
     # Display the image
     display.image(image)
@@ -105,17 +104,17 @@ try:
     button.pull = Pull.UP # Pull up resistor
 
     # Initialize the SPI and the display
-    spi = busio.SPI(board.SCK, MOSI=board.MOSI)
+    spi = busio.SPI(board.SCK, MOSI=board.MOSI) # Create SPI bus
     scs = digitalio.DigitalInOut(board.D5)  # inverted chip select
-    display = adafruit_sharpmemorydisplay.SharpMemoryDisplay(spi, scs, 144, 168)
+    display = adafruit_sharpmemorydisplay.SharpMemoryDisplay(spi, scs, 144, 168) # Create display object
 
     # Clear the display
     display.fill(1)
     display.show()
 
     # Load a TrueType or OpenType font
-    font_path = "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"
-    if os.path.isfile(font_path):
+    font_path = "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf" # Path to font
+    if os.path.isfile(font_path): # If the file exists
         font = ImageFont.truetype(font_path, 12)  # Increase the size to 30
     else:
         print(f"The file {font_path} does not exist.")
@@ -127,21 +126,22 @@ try:
     draw = ImageDraw.Draw(image)
 
     # Calculate the maximum number of characters that can fit in a line
-    bbox = draw.textbbox((0, 0), "x", font=font)
-    char_width, char_height = bbox[2] - bbox[0], bbox[3] - bbox[1]
-    max_chars = display.width // char_width
+    bbox = draw.textbbox((0, 0), "x", font=font) # Get the bounding box of the text
+    char_width, char_height = bbox[2] - bbox[0], bbox[3] - bbox[1] # Calculate the width and height of the text
+    max_chars = display.width // char_width # Calculate the maximum number of characters that can fit in a line
 
     # Initialize pygame mixer
-    FORMAT = pyaudio.paInt16
+    FORMAT = pyaudio.paInt16 # Format of the audio
     CHANNELS = 1           # Number of channels
     BITRATE = 48000        # Audio Bitrate
     CHUNK_SIZE = 2048     # Chunk size to 
     RECORDING_LENGTH = 7  # Recording Length in seconds
-    WAVE_OUTPUT_FILENAME = "recording.wav"
-    audio = pyaudio.PyAudio()
-    device_id = 2 # Choose a device adafriut voice bonnet
+    WAVE_OUTPUT_FILENAME = "recording.wav" # Name of the file to save the recording to
+    audio = pyaudio.PyAudio() # Initialize PyAudio
+    device_id_input = 2 # Choose a device adafriut voice bonnet
+    device_id_output = 1 # Index of 'bcm2835 Headphones'
 
-    print("Recording using Input Device ID "+str(device_id))
+    print("Recording using Input Device ID "+str(device_id_input))
 
     print("Press the button to ask a question")
     set_color(0, 255, 0)  # Set all LEDs to green
@@ -156,7 +156,6 @@ try:
             display.image(image)
             display.show()
             
-            
             set_color(0, 0, 255)  # Set all LEDs to blue
 
             stream = py_audio.open( # Open the stream
@@ -165,8 +164,8 @@ try:
                 rate=BITRATE,
                 input=True,
                 output=True,
-                input_device_index=device_id,
-                output_device_index=1, # Index of 'bcm2835 Headphones'
+                input_device_index=device_id_input,
+                output_device_index=device_id_output, 
                 frames_per_buffer=CHUNK_SIZE
             )
             recording_frames = [] # Initialize recording frames
@@ -216,12 +215,12 @@ try:
                     wrapped_text = textwrap.fill(text, width=max_chars, break_long_words=True)
                     lines = wrapped_text.split('\n')
                     y_text = 0
-                    for line in lines:
-                        bbox = draw.textbbox((0, y_text), line, font=font)
-                        width, height = bbox[2] - bbox[0], bbox[3] - bbox[1]
-                        if y_text + height > display.height:
+                    for line in lines: # Draw each line
+                        bbox = draw.textbbox((0, y_text), line, font=font) # Get the bounding box of the text
+                        width, height = bbox[2] - bbox[0], bbox[3] - bbox[1] # Calculate the width and height of the text
+                        if y_text + height > display.height: # If the text is too long to fit on the display
                             break
-                        draw.text((0, y_text), line, font=font, fill=0)
+                        draw.text((0, y_text), line, font=font, fill=0) # Draw the text
                         y_text += height
 
                     # Display the image on the display
@@ -230,14 +229,14 @@ try:
 
                 # Send request to OpenAI
                 print("Sending request to GPT-3.5, waiting for reply...")
-                completion = client.chat.completions.create(
+                completion = client.chat.completions.create( # Send request to API
                     model="gpt-3.5-turbo",
-                    messages=[
-                        {
+                    messages=[ # Messages to send to the API
+                        { 
                             "role": "assistant",
                             "content": "Answer the question, Use at most 30 words, and in Swedish.",
                         },
-                        {
+                        { 
                             "role": "user",
                             "content": transcript,
                         },
@@ -306,5 +305,5 @@ try:
 
                 set_color(0, 255, 0)  # Set all LEDs to green 
 
-except Exception as problem:
-    handle_error(problem)
+except Exception as problem: # If there is an error
+    handle_error(problem) # Handle the error
