@@ -1,38 +1,54 @@
-from openai import OpenAI
-from google.cloud import speech
-from google.cloud import texttospeech
+# Standard library imports
+import os
+import time
+import atexit
+import wave
+import textwrap
+
+# Third party imports
+
+# Audio processing libraries
+import pyaudio
 import pygame
 import sounddevice as sd
 from scipy.io.wavfile import write
-import pyaudio
-import wave
-import os
-from digitalio import DigitalInOut, Direction, Pull
-import board
-from PIL import Image, ImageDraw, ImageFont
-import adafruit_sharpmemorydisplay
+
+# Google Cloud services
+from google.cloud import speech, texttospeech
+
+# Machine learning library
+from openai import OpenAI
+
+# Hardware interaction libraries
 import busio
 import digitalio
-import textwrap
-import adafruit_dotstar
-import time
-import atexit
 import neopixel
+import adafruit_dotstar
+import adafruit_sharpmemorydisplay
+
+# Image processing libraries
+from PIL import Image, ImageDraw, ImageFont
+
+# Local application/library specific imports
+import digitalio
+from PIL import Image, ImageDraw, ImageFont
+from digitalio import DigitalInOut, Direction, Pull
+import board
 
 print("Chatbot started")
 
 # Set environment variables
-os.environ['OPENAI_API_KEY'] = 'key'
-os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = 'key.json'
+os.environ['OPENAI_API_KEY'] = "key"
+os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = "key.json"
 
 #setup LEDs on the bonnet
 DOTSTAR_DATA = board.D5
 DOTSTAR_CLOCK = board.D6 
-dots = adafruit_dotstar.DotStar(DOTSTAR_CLOCK, DOTSTAR_DATA, 3, brightness=1)
+dots = adafruit_dotstar.DotStar(DOTSTAR_CLOCK, DOTSTAR_DATA, 3, brightness=0.1)
 
 #setup LEDs on the ring
 pixels = neopixel.NeoPixel(board.D12, 16)
-pixels.brightness = 0.2
+pixels.brightness = 0.1
 
 def exit_handler(): # Turn off the LEDs and clear the display when the program exits
     # Clear the display
@@ -50,8 +66,10 @@ def set_color(r, g, b):
     dots.show()
     pixels.fill((r, g, b))
     pixels.show()
+    
 
 set_color(255, 255, 0)  # Set all LEDs to yellow
+
 
 def speech_to_text(config: speech.RecognitionConfig, audio: speech.RecognitionAudio) -> speech.RecognizeResponse:
     client = speech.SpeechClient()
@@ -69,10 +87,13 @@ def text_to_speech(text: str, output_filename: str):
 
 # Function to handle errors
 def handle_error(problem):
+    
     set_color(255, 0, 0)  # Set all LEDs to red
 
     # Clear the display
-    display.fill(1)
+    draw = ImageDraw.Draw(image)
+    draw.rectangle((0, 0, display.width, display.height), fill=1)
+    display.image(image)
     display.show()
 
     # Draw the error message on the image
@@ -115,7 +136,7 @@ try:
 
     # Initialize the SPI and the display
     spi = busio.SPI(board.SCK, MOSI=board.MOSI)
-    scs = digitalio.DigitalInOut(board.D5)  # inverted chip select
+    scs = digitalio.DigitalInOut(board.D26)  # inverted chip select
     display = adafruit_sharpmemorydisplay.SharpMemoryDisplay(spi, scs, 144, 168)
 
     # Clear the display
@@ -140,28 +161,23 @@ try:
     char_width, char_height = bbox[2] - bbox[0], bbox[3] - bbox[1]
     max_chars = display.width // char_width
 
-    # Initialize PyAudio
-    py_audio = pyaudio.PyAudio()
-
-    # initialize audio recording
-    FORMAT = pyaudio.paInt16 # Format of the audio
-    CHANNELS = 1           # Number of channels
-    BITRATE = 48000        # Audio Bitrate
-    CHUNK_SIZE = 2048     # Chunk size to 
-    RECORDING_LENGTH = 7  # Recording Length in seconds
-    WAVE_OUTPUT_FILENAME = "recording.wav" # Name of the file to save the recording to
-    audio = pyaudio.PyAudio() # Initialize PyAudio
-    device_id_input = 2 # Choose a device adafriut voice bonnet 2 if using monitor 1 if not
-    device_id_output = 1 # Choose a device bcm2835 Headphones
-
-    print("Recording using Input Device ID "+str(device_id_input))
-
     print("Press the button to ask a question")
     set_color(0, 255, 0)  # Set all LEDs to green
 
     while True: # Loop forever    
         if not button.value:  # Button is pressed
             print("Button pressed")
+
+            # initialize audio recording
+            FORMAT = pyaudio.paInt16 # Format of the audio
+            CHANNELS = 1           # Number of channels 
+            BITRATE = 48000        # Audio Bitrate
+            CHUNK_SIZE = 2048     # Chunk size to 
+            RECORDING_LENGTH = 7  # Recording Length in seconds
+            WAVE_OUTPUT_FILENAME = "recording.wav" # Name of the file to save the recording to
+            py_audio = pyaudio.PyAudio() # Initialize PyAudio
+            device_id_input = 3 # Choose a device adafriut voice bonnet 2 if using monitor 1 if not
+            device_id_output = 1 # Choose a device bcm2835 Headphones
             
             # Clear the display by drawing a rectangle that covers the entire screen
             draw = ImageDraw.Draw(image)
@@ -169,8 +185,6 @@ try:
             display.image(image)
             display.show()           
             
-            set_color(0, 0, 255)  # Set all LEDs to blue
-
             stream = py_audio.open( # Open the stream
                 format=FORMAT,
                 channels=CHANNELS,
@@ -182,6 +196,8 @@ try:
                 frames_per_buffer=CHUNK_SIZE
             )
             recording_frames = [] # Initialize recording frames
+
+            set_color(0, 0, 255)  # Set all LEDs to blue
 
             while not button.value:  # Record as long as the button is being pressed
                 data = stream.read(CHUNK_SIZE)  # Read data from stream
@@ -285,8 +301,8 @@ try:
                 # Convert text to speech
                 text_to_speech(reply, "response.mp3")
 
-                set_color(255, 0, 255)  # Set all LEDs to green
-
+                set_color(255, 0, 255)  # Set all LEDs to magenta
+                
                 # Initialize pygame mixer
                 pygame.mixer.init()
 
@@ -300,7 +316,14 @@ try:
                 while pygame.mixer.music.get_busy():
                     pygame.time.Clock().tick(10)
 
+                # Close the mixer
+                pygame.mixer.quit()
+
                 set_color(0, 255, 0)  # Set all LEDs to green
+
+                stream.stop_stream()
+                stream.close()
+                py_audio.terminate()
 
             else:
                 print("Speech Recognition could not understand audio")
@@ -322,7 +345,18 @@ try:
                 display.image(image)
                 display.show()
 
+                stream.stop_stream()
+                stream.close()
+                py_audio.terminate()
+
                 set_color(0, 255, 0)  # Set all LEDs to green 
 
+        time.sleep(0.1) # Sleep for 0.1 seconds
 except Exception as problem:
-    handle_error(problem)
+    try: # Try to clean up
+        pygame.mixer.quit()
+        stream.stop_stream()
+        stream.close()
+        py_audio.terminate()
+    finally: # If it fails, handle the error
+        handle_error(problem)
