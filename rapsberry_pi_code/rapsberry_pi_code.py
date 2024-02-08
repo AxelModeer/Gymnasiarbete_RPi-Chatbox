@@ -26,11 +26,7 @@ import neopixel
 import adafruit_dotstar
 import adafruit_sharpmemorydisplay
 
-# Image processing libraries
-from PIL import Image, ImageDraw, ImageFont
-
 # Local application/library specific imports
-import digitalio
 from PIL import Image, ImageDraw, ImageFont
 from digitalio import DigitalInOut, Direction, Pull
 import board
@@ -64,26 +60,25 @@ def set_color(r, g, b):
     for i in range(3):
         dots[i] = (g, b, r)  # Change the order to GBR, because it is the oder that the bonnet uses
     dots.show()
-    pixels.fill((r, g, b))
+    pixels.fill((r, g, b)) # Set all LEDs to the specified color
     pixels.show()
     
-
 set_color(255, 255, 0)  # Set all LEDs to yellow
 
-
-def speech_to_text(config: speech.RecognitionConfig, audio: speech.RecognitionAudio) -> speech.RecognizeResponse:
-    client = speech.SpeechClient()
+# Function to convert speech to text
+def speech_to_text(_config: speech.RecognitionConfig, _audio: speech.RecognitionAudio) -> speech.RecognizeResponse: 
     print("Speech to text started")
-    response = client.recognize(config=config, audio=audio)
-    return response
+    _response = stt_client.recognize(config=_config, audio=_audio) # Send request to API
+    return _response # Return the response
 
-def text_to_speech(text: str, output_filename: str):
-    synthesis_input = texttospeech.SynthesisInput(text=text)
-    voice = texttospeech.VoiceSelectionParams(language_code="sv-SE", ssml_gender=texttospeech.SsmlVoiceGender.NEUTRAL)
-    audio_config = texttospeech.AudioConfig(audio_encoding=texttospeech.AudioEncoding.MP3)
-    response = tts_client.synthesize_speech(input=synthesis_input, voice=voice, audio_config=audio_config)
-    with open(output_filename, "wb") as out:
-        out.write(response.audio_content)
+# Function to convert text to speech
+def text_to_speech(_text: str, _output_filename: str): 
+    _synthesis_input = texttospeech.SynthesisInput(text=_text) # Create input for the text to speech
+    _voice = texttospeech.VoiceSelectionParams(language_code="sv-SE", ssml_gender=texttospeech.SsmlVoiceGender.NEUTRAL) # Set the voice
+    _audio_config = texttospeech.AudioConfig(audio_encoding=texttospeech.AudioEncoding.MP3) # Set the audio encoding
+    _response = tts_client.synthesize_speech(input=_synthesis_input, voice=_voice, audio_config=_audio_config) # Send request to API
+    with open(_output_filename, "wb") as out: # Write the response to a file
+        out.write(_response.audio_content)
 
 # Function to handle errors
 def handle_error(problem):
@@ -98,8 +93,6 @@ def handle_error(problem):
 
     # Draw the error message on the image
     draw = ImageDraw.Draw(image)
-
-    # Draw the error message on the image
     text = str(problem)
     wrapped_text = textwrap.fill(text, width=max_chars, break_long_words=True)
     lines = wrapped_text.split('\n')
@@ -123,8 +116,10 @@ try:
     # Create client to OpenAI, gets API Key from environment variable OPENAI_API_KEY
     client = OpenAI()
 
-    # Instantiate a client for Google Text-to-Speech
+    # Instantiate a client for Google Text-to-Speech API
     tts_client = texttospeech.TextToSpeechClient()
+    # Create a client for Google's speech recognition API
+    stt_client = speech.SpeechClient() 
 
     # Initialize transcript
     transcript = ""
@@ -146,7 +141,7 @@ try:
     # Load a TrueType or OpenType font
     font_path = "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"
     if os.path.isfile(font_path):
-        font = ImageFont.truetype(font_path, 12)  # Increase the size to 30
+        font = ImageFont.truetype(font_path, 12)  # Increase the size to 12
     else:
         print(f"The file {font_path} does not exist.")
 
@@ -219,23 +214,14 @@ try:
 
             # Read the audio file
             with open("recording.wav", "rb") as audio_file:
-                audiodata = audio_file.read() # Read the audio file
+                audiodata = audio_file.read() # Read the audio file and save as binary data
 
-            recognition_audio = speech.RecognitionAudio(content=audiodata) # Create audio object for Google's speech recognitionCreate audio object for Google's speech recognition
-
-            # Convert speech to text using Google's speech recognition. Credentials are stored in the JSON file
-            # pointed to in environment variable GOOGLE_APPLICATION_CREDENTIALS
-            audio = speech.RecognitionAudio(
-                content=audiodata,
-            )
-            config = speech.RecognitionConfig( # Configuration for the recognizer
-                language_code="sv-SE", # Language code for Swedish
-            )
-
+            # Send request to Google's speech recognition
+            audio = speech.RecognitionAudio(content=audiodata,) # Create audio object for Google's speech recognition
+            config = speech.RecognitionConfig(language_code="sv-SE",) # Set the language code
             response = speech_to_text(config, audio) # Send request to API
 
             y_text = 0  # Initialize y_text here
-
             if response.results: # If there is a response aka if the API understood the audio
                 for result in response.results: # Print the result
                     print("Google Speech Recognition thinks you said:")
@@ -243,16 +229,15 @@ try:
                     print(transcript)
                     # Draw the text on the image
                     text = transcript
-                    wrapped_text = textwrap.fill(text, width=max_chars, break_long_words=True)
-                    lines = wrapped_text.split('\n')
-                    y_text = 0
-                    for line in lines:
-                        bbox = draw.textbbox((0, y_text), line, font=font)
-                        width, height = bbox[2] - bbox[0], bbox[3] - bbox[1]
-                        if y_text + height > display.height:
+                    wrapped_text = textwrap.fill(text, width=max_chars, break_long_words=True) # Wrap the text
+                    lines = wrapped_text.split('\n') # Split the text into lines
+                    for line in lines: # Loop through the lines
+                        bbox = draw.textbbox((0, y_text), line, font=font) # Get the bounding box of the text
+                        width, height = bbox[2] - bbox[0], bbox[3] - bbox[1] # Calculate the width and height of the text
+                        if y_text + height > display.height: # If the text is too long to fit on the display,
                             break
-                        draw.text((0, y_text), line, font=font, fill=0)
-                        y_text += height
+                        draw.text((0, y_text), line, font=font, fill=0) # Draw the text on the image
+                        y_text += height # Increment y_text by the height of the text
 
                     # Display the image on the display
                     display.image(image)
@@ -263,11 +248,11 @@ try:
                 completion = client.chat.completions.create(
                     model="gpt-3.5-turbo",
                     messages=[
-                        {
+                        { # Kontext
                             "role": "assistant",
                             "content": "Answer the question, Use at most 30 words, and in Swedish.",
                         },
-                        {
+                        { # Question
                             "role": "user",
                             "content": transcript,
                         },
@@ -303,33 +288,25 @@ try:
 
                 set_color(255, 0, 255)  # Set all LEDs to magenta
                 
-                # Initialize pygame mixer
-                pygame.mixer.init()
-
-                # Load the mp3 file
-                pygame.mixer.music.load("response.mp3")
-
-                # Play the mp3 file
-                pygame.mixer.music.play()
-
-                # Wait for the audio to finish playing
-                while pygame.mixer.music.get_busy():
+                # Play the audio
+                pygame.mixer.init() # Initialize pygame mixer 
+                pygame.mixer.music.load("response.mp3") # Load the mp3 file
+                pygame.mixer.music.play() # Play the mp3 file
+                while pygame.mixer.music.get_busy(): # Wait for the audio to finish playing
                     pygame.time.Clock().tick(10)
-
-                # Close the mixer
-                pygame.mixer.quit()
+                pygame.mixer.quit()  # Close the mixer
 
                 set_color(0, 255, 0)  # Set all LEDs to green
 
-                stream.stop_stream()
+                stream.stop_stream() 
                 stream.close()
                 py_audio.terminate()
 
             else:
-                print("Speech Recognition could not understand audio")
+                print("Mikrofonen uppfate inte vad du sa, kan du säga det igen?")
 
                 # Draw the text on the image
-                text = "Speech Recognition could not understand audio"
+                text = "Mikrofonen uppfate inte vad du sa, kan du säga det igen?"
                 wrapped_text = textwrap.fill(text, width=max_chars, break_long_words=True)
                 lines = wrapped_text.split('\n')
                 y_text += font.getbbox(' ')[3]
@@ -358,5 +335,5 @@ except Exception as problem:
         stream.stop_stream()
         stream.close()
         py_audio.terminate()
-    finally: # If it fails, handle the error
+    finally: # If it fails or not, handle the error
         handle_error(problem)
