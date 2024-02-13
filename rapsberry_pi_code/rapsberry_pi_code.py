@@ -51,6 +51,12 @@ def exit_handler(): # Turn off the LEDs and clear the display when the program e
     display.fill(1)
     display.show()
 
+    # Turn off all audio devices
+    pygame.mixer.quit()
+    stream.stop_stream()
+    stream.close()
+    py_audio.terminate()
+
     set_color(0, 0, 0)  # Set all LEDs to off
 
 # Register the exit handler
@@ -330,10 +336,4 @@ try:
 
         time.sleep(0.1) # Sleep for 0.1 seconds
 except Exception as problem:
-    try: # Try to clean up
-        pygame.mixer.quit()
-        stream.stop_stream()
-        stream.close()
-        py_audio.terminate()
-    finally: # If it fails or not, handle the error
-        handle_error(problem)
+    handle_error(problem)
