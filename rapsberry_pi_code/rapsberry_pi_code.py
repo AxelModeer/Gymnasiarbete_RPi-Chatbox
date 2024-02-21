@@ -162,6 +162,18 @@ try:
     char_width, char_height = bbox[2] - bbox[0], bbox[3] - bbox[1]
     max_chars = display.width // char_width
 
+    py_audio = pyaudio.PyAudio() # Initialize PyAudio
+
+    # declare the variables for the audio
+    FORMAT = pyaudio.paInt16 # Format of the audio
+    CHANNELS = 1           # Number of channels 
+    BITRATE = 48000        # Audio Bitrate
+    CHUNK_SIZE = 2048     # Chunk size to 
+    RECORDING_LENGTH = 7  # Recording Length in seconds
+    WAVE_OUTPUT_FILENAME = "recording.wav" # Name of the file to save the recording to
+    device_id_input = 3 # Choose a device adafriut voice bonnet 3 if using monitor 1 if not
+    device_id_output = 1 # Choose a device bcm2835 Headphones
+
     print("Press the button to ask a question")
     set_color(0, 255, 0)  # Set all LEDs to green
 
@@ -169,19 +181,7 @@ try:
         if not button.value:  # Button is pressed
             print("Button pressed")
 
-            # initialize audio recording
-            FORMAT = pyaudio.paInt16 # Format of the audio
-            CHANNELS = 1           # Number of channels 
-            BITRATE = 48000        # Audio Bitrate
-            CHUNK_SIZE = 2048     # Chunk size to 
-            RECORDING_LENGTH = 7  # Recording Length in seconds
-            WAVE_OUTPUT_FILENAME = "recording.wav" # Name of the file to save the recording to
-            py_audio = pyaudio.PyAudio() # Initialize PyAudio
-            device_id_input = 3 # Choose a device adafriut voice bonnet 2 if using monitor 1 if not
-            device_id_output = 1 # Choose a device bcm2835 Headphones
-            
             # Clear the display by drawing a rectangle that covers the entire screen
-            draw = ImageDraw.Draw(image)
             draw.rectangle((0, 0, display.width, display.height), fill=1)
             display.image(image)
             display.show()           
