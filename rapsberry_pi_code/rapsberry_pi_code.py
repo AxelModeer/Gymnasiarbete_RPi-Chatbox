@@ -256,7 +256,7 @@ try:
                     messages=[
                         { # Kontext
                             "role": "assistant",
-                            "content": "Answer the question, Use at most 30 words, and in Swedish.",
+                            "content": "Answer the question, Use at most 30 words, and in the same language as the question.",
                         },
                         { # Question
                             "role": "user",
