@@ -36,6 +36,5 @@ Then just put in to make it start on reboot after 30 seconds to give it time to 
 @reboot sleep 30 && sudo -E env "PATH=$PATH" /home/user/env/bin/python3 /CodeAdress.py
 ```
 After that, you can ask away. Remember that the APIs have a cost, so you need to have some credit on them. According to my calculation, the cost is around 10,000 questions per $6.
-```vbnet
+
 Let me know if you need further assistance or if you have any questions!
-```
